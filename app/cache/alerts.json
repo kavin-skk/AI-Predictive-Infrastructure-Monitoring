@@ -1,0 +1,16 @@
+[
+    {
+        "time": "2026-07-13 18:30:00",
+        "metric": "CPU Usage",
+        "value": "100%",
+        "severity": "Critical",
+        "message": "CPU usage exceeded threshold."
+    },
+    {
+        "time": "2026-07-13 18:35:00",
+        "metric": "Memory Usage",
+        "value": "2.4 GB",
+        "severity": "Critical",
+        "message": "Memory usage exceeded threshold."
+    }
+]
