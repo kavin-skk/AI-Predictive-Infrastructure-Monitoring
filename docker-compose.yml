@@ -16,6 +16,8 @@ services:
     container_name: ai-scheduler
     command: python scheduler.py
     restart: unless-stopped
+    env_file:
+      - ./app/.env
     depends_on:
       - monitoring-app
 

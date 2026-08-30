@@ -11,10 +11,19 @@ class AnomalyDetector:
         self.cpu_threshold = 80          # %
         self.memory_threshold = 1.5      # GB
 
+        # Primary application container to monitor
+        self.target_container = "monitoring-app"
+
     def _get_metric_value(self, metric):
 
         try:
-            return float(metric["data"]["result"][0]["value"][1])
+            results = metric["data"]["result"]
+
+            if not results:
+                return None
+
+            return float(results[0]["value"][1])
+
         except Exception:
             return None
 
@@ -22,18 +31,22 @@ class AnomalyDetector:
 
         anomalies = []
 
-        # -----------------------
-        # CPU
-        # -----------------------
+        # ====================================================
+        # CPU USAGE
+        # ====================================================
 
-        cpu_metric = self.metrics.get_cpu_usage()
+        # Calculate CPU percentage using Prometheus rate()
+        cpu_query = f"""
+        rate(container_cpu_usage_seconds_total{{name="{self.target_container}"}}[1m]) * 100
+        """
 
-        cpu_raw = self._get_metric_value(cpu_metric)
+        cpu_metric = self.metrics.query(cpu_query)
 
-        if cpu_raw is not None:
+        cpu_percent = self._get_metric_value(cpu_metric)
 
-            # Convert raw cumulative counter into an approximate percentage
-            cpu_percent = min(cpu_raw, 100)
+        if cpu_percent is not None:
+
+            cpu_percent = round(cpu_percent, 2)
 
             if cpu_percent > self.cpu_threshold:
 
@@ -41,7 +54,7 @@ class AnomalyDetector:
 
                     "metric": "CPU Usage",
 
-                    "value": round(cpu_percent, 2),
+                    "value": cpu_percent,
 
                     "unit": "%",
 
@@ -49,11 +62,15 @@ class AnomalyDetector:
 
                 })
 
-        # -----------------------
-        # MEMORY
-        # -----------------------
+        # ====================================================
+        # MEMORY USAGE
+        # ====================================================
 
-        memory_metric = self.metrics.get_memory_usage()
+        memory_query = f"""
+        container_memory_usage_bytes{{name="{self.target_container}"}}
+        """
+
+        memory_metric = self.metrics.query(memory_query)
 
         memory_raw = self._get_metric_value(memory_metric)
 
@@ -61,13 +78,15 @@ class AnomalyDetector:
 
             memory_gb = memory_raw / (1024 * 1024 * 1024)
 
+            memory_gb = round(memory_gb, 2)
+
             if memory_gb > self.memory_threshold:
 
                 anomalies.append({
 
                     "metric": "Memory Usage",
 
-                    "value": round(memory_gb, 2),
+                    "value": memory_gb,
 
                     "unit": "GB",
 
