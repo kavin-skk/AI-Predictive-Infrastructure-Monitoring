@@ -1,8 +1,6 @@
 {
     "success": true,
-    "status": "Healthy",
-    "message": "Waiting for AI analysis...",
-    "anomalies": [],
-    "incident": "",
-    "ai_summary": "No incident analyzed yet."
+    "status": "Critical",
+    "incident": "CPU Usage = 96%\nStatus = Critical",
+    "ai_summary": "CPU saturation detected."
 }

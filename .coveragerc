@@ -1,0 +1,17 @@
+[run]
+source = app
+
+[report]
+omit =
+    app/app.py
+    app/phase2_ui.py
+    app/phase2_e2e_ui.py
+    app/*_demo.py
+    app/generate_ai_summary.py
+    app/scheduler.py
+    app/tests/*
+    app/test_*.py
+
+exclude_lines =
+    pragma: no cover
+    if __name__ == .__main__.:

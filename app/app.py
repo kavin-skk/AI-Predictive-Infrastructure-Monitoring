@@ -3,6 +3,9 @@ from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 from database import test_connection, get_products
 from ai.incident_summary import IncidentSummary
 from ai.anomaly_detector import AnomalyDetector
+from phase2_api import phase2
+from phase2_ui import phase2_ui
+from phase2_e2e_ui import phase2_e2e_ui
 from ai.cache_service import CacheService
 from ai.alert_service import AlertService
 
@@ -39,6 +42,9 @@ provider.add_span_processor(
 # Flask App
 # ----------------------------
 app = Flask(__name__)
+app.register_blueprint(phase2)
+app.register_blueprint(phase2_e2e_ui)
+app.register_blueprint(phase2_ui)
 
 FlaskInstrumentor().instrument_app(app)
 
